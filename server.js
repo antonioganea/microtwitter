@@ -4,6 +4,7 @@ const app = express()
 const port = 80
 
 const fs = require('fs');
+const dateFormat = require('dateformat');
 
 var bodyParser = require('body-parser');
 
@@ -49,12 +50,30 @@ app.get('/', (req,res) => {
     });
 })
 
-app.post('/login', (req,res) => {
-    console.log(req.body);
-    if ( req.body.pass !== "antonio" ){
-        res.json({ok:false});
+function auth(user,pass){
+    if ( user == "antonio" && pass == "pass" ) {
+        return true;
+    } else {
+        return false;
     }
-    res.json({ok:true, user:req.body.user, pass:req.body.pass});
+}
+
+app.post('/login', (req,res) => {
+    //console.log(req.body);
+    let user = req.body.user;
+    let pass = req.body.pass;
+    let ok = auth(user,pass);
+    res.json({ok:ok, user:user, pass:pass});
+})
+
+app.post('/postTweet', (req,res) => {
+    console.log(req.body);
+    let user = req.body.user;
+    let pass = req.body.pass;
+    let text = req.body.text;
+    let ok = auth(user,pass);
+    let date = dateFormat(new Date(), "dddd, mmmm dS, yyyy, h:MM:ss TT");
+    res.json({ok:ok, user:user, date:date, text:text});
 })
 
 app.post('/register', (req,res) => {

@@ -58,6 +58,13 @@ input[type=text], select {
     box-sizing: border-box;
 }
 
+textarea {
+    width: 100%;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    box-sizing: border-box;
+}
+
 input[type=password], select {
     padding: 8px 10px;
     margin: 4px 0;
@@ -89,12 +96,14 @@ input[type=submit]:hover {
     color:white;
 }
 
+.leftside {
+    flex-grow: 75;
+}
+
 .tweet-container {
     display: flex;
     flex-direction: column;
     justify-content: space-around;
-
-    flex-grow: 75;
 }
 
 .tweet {

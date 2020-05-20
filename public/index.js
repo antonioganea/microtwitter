@@ -24,6 +24,9 @@ loggedinDisplay = document.getElementById("loggedin");
 loggedinparent = document.getElementById("loggedinparent");
 loginformDisp = document.getElementById("loginformDisp");
 
+globalUser = null;
+globalPass = null;
+
 
 /*
                 <div class="tweet">
@@ -66,7 +69,17 @@ function createTweet(username,date,text){
 
     tweet.innerHTML += text;
 
-    tweetcontainer.appendChild(tweet);
+    return tweet;
+}
+
+function createTweetOnBottom(user,date,text) {
+    let tw = createTweet(user,date,text);
+    tweetcontainer.appendChild(tw);
+}
+
+function createTweetOnTop(user,date,text) {
+    let tw = createTweet(user,date,text);
+    tweetcontainer.prepend(tw);
 }
 
 function clearTweets() {
@@ -83,7 +96,7 @@ function getLatestTweets() {
         if (data.ok !== true){ return; }
         clearTweets();
         data.tweets.forEach(tweet => {
-            createTweet(tweet.user, tweet.date, tweet.text);
+            createTweetOnBottom(tweet.user, tweet.date, tweet.text);
         });
     });
 }
@@ -98,8 +111,10 @@ function checkIfLogged() {
 checkIfLogged();
 
 function onLogged(user, pass, storeLogged = true) {
-    loggedInDisplay("Logged in as " + user);
+    loggedInDisplay("Logged in as @" + user);
     showElem(loginform, false);
+    globalUser = user;
+    globalPass = pass;
     if ( storeLogged ) {
         window.localStorage.setItem("loggedUsername", user);
         window.localStorage.setItem("loggedPassword", pass);
@@ -145,8 +160,51 @@ function logout(){
     window.localStorage.removeItem("loggedPassword");
     showElem(loginform,true);
     showElem(loggedinparent,false);
+    globalPass = null;
+    globalUser = null;
 }
 
 function onLogoutClick() {
     logout();
+}
+
+tweetEditor = document.getElementById("tweetEditor");
+
+function isLogged() {
+    if ( getUser() && getPass() ){
+        return true;
+    } else {
+        return false;
+    }
+}
+
+function getUser(){
+    return globalUser;
+}
+
+function getPass() {
+    return globalPass;
+}
+
+function postTweet(text) {
+    let user = getUser();
+    let pass = getPass();
+    let data = {text:text, user:user, pass:pass};
+
+    postData("/postTweet", data).then(data=>{
+        console.log(data);
+        if ( data.ok === true ){
+            //onLogged(data.user, data.pass);
+            createTweetOnTop(data.user,data.date,data.text);
+        } else {
+            alert("Post failed!");
+        }
+    });
+}
+
+function onPostClick() {
+    let text = tweetEditor.value;
+    if ( text !== "" )
+        postTweet(text);
+    tweetEditor.value="";
 }
