@@ -1,5 +1,71 @@
 /* CSS file */
 
-p{ 
-    color:green;
+@font-face {
+    font-family: bariol;
+    src: url(bariol.otf);
+  }
+
+body {
+    display:flex;
+    justify-content: center;
+    background-color: rgb(24, 17, 29);
+    font-family: bariol;
 }
+
+.container {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-evenly;
+    width: 50%;
+}
+
+.header {
+    /*background: dodgerblue;*/
+    text-align: center;
+    padding-top: 2rem;
+    padding-bottom: 2rem;
+    font-size: xx-large;
+    color: white;
+  }
+  
+.footer {
+    padding-top: 3rem;
+    text-align: center;
+    color: white;
+}
+
+.middle {
+    display: flex;
+    flex-direction: row;
+}
+
+.rightside {
+    display:flex;
+    width: 100%;
+    justify-content: space-around;
+}
+
+.tweet-container {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-around;
+    background-color: indigo;
+    width: 100%;
+}
+
+.tweet {
+    padding: 10px;
+}
+
+@media only screen and (max-width: 600px) {
+    .container {
+      width: 100%;
+    }
+    .middle {
+        flex-direction: column;
+        font-size: larger;
+    }
+    .rightside {
+        background-color: red;
+    }
+  }
