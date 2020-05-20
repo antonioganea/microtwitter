@@ -5,6 +5,8 @@ const port = 80
 
 const fs = require('fs');
 
+var bodyParser = require('body-parser');
+
 let indexHTML = null;
 
 function loadIndexHTML() {
@@ -17,6 +19,9 @@ function loadIndexHTML() {
     });
 }
 loadIndexHTML();
+
+app.use(bodyParser.json()); // support json encoded bodies
+app.use(bodyParser.urlencoded({ extended: true })); // support encoded bodies
 
 app.get('/unit', (req, res) => res.send('Hello World!'))
 
@@ -42,6 +47,16 @@ app.get('/', (req,res) => {
         res.writeHead(200);
         res.end(data);
     });
+})
+
+app.post('/login', (req,res) => {
+    console.log(req.body);
+    res.json({ok:true})
+})
+
+app.post('/register', (req,res) => {
+    console.log(req.body);
+    res.json({ok:true})
 })
 
 app.use('/static', express.static('public'))
