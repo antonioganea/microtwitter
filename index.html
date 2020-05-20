@@ -41,7 +41,11 @@
                 </div>
             </div>
             <div class="rightside">
-                <div class="loginform">
+                <div id="loggedinparent" class="smallloggedin" style="display: none;">
+                <div id="loggedin"></div>
+                <input type="submit" value="Logout" onclick="return onLogoutClick();">
+                </div>
+                <div id="loginform" class="loginform">
                     Login form
                     <br>
                     <input type="text" id="fname" name="firstname" placeholder="username">
@@ -50,6 +54,7 @@
                     <br>
                     <input type="submit" value="Login" onclick="return onLoginClick();">
                     <input type="submit" value="Register" onclick="return onRegisterClick();">
+                    <div id="loginformDisp"></div>
                 </div>
             </div>
         </div>

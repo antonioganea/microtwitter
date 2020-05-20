@@ -51,12 +51,15 @@ app.get('/', (req,res) => {
 
 app.post('/login', (req,res) => {
     console.log(req.body);
-    res.json({ok:true})
+    if ( req.body.pass !== "antonio" ){
+        res.json({ok:false});
+    }
+    res.json({ok:true, user:req.body.user, pass:req.body.pass});
 })
 
 app.post('/register', (req,res) => {
     console.log(req.body);
-    res.json({ok:true})
+    res.json({ok:true, user:req.body.user, pass:req.body.pass});
 })
 
 app.use('/static', express.static('public'))

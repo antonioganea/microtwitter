@@ -16,9 +16,14 @@ async function postData(url = '', data = {}) {
     return response.json();
 }
 
+loginform = document.getElementById("loginform");
 usernameform = document.getElementById("fname");
 passform = document.getElementById("fpass");
 tweetcontainer = document.getElementById("tweet-container");
+loggedinDisplay = document.getElementById("loggedin");
+loggedinparent = document.getElementById("loggedinparent");
+loginformDisp = document.getElementById("loginformDisp");
+
 
 /*
                 <div class="tweet">
@@ -30,6 +35,14 @@ tweetcontainer = document.getElementById("tweet-container");
                     So this is what i was saying regarding that..
                 </div>
 */
+
+function showElem(elem, show){
+    if ( show === true ){
+        elem.style.display = "block";
+    } else {
+        elem.style.display = "none";
+    }
+}
 
 function createTweet(username,date,text){
     let tweet = document.createElement('div');
@@ -60,16 +73,80 @@ function clearTweets() {
     tweetcontainer.innerHTML = "";
 }
 
-function onLoginClick() {
-    createTweet("antonio","17 apr", "hello");
-    postData("/login", {user: usernameform.value, pass: passform.value}).then(data=>{
-        console.log(data);
+function loggedInDisplay(text){
+    showElem(loggedinparent,true);
+    loggedinDisplay.innerHTML = text;
+}
+
+function getLatestTweets() {
+    postData("/latest").then(data=>{
+        if (data.ok !== true){ return; }
+        clearTweets();
+        data.tweets.forEach(tweet => {
+            createTweet(tweet.user, tweet.date, tweet.text);
+        });
     });
 }
 
+function checkIfLogged() {
+    let user = window.localStorage.getItem("loggedUsername");
+    let pass = window.localStorage.getItem("loggedPassword");
+    if ( user !== null && pass !== null ) {
+        onLogged(user, pass, false);
+    }
+}
+checkIfLogged();
+
+function onLogged(user, pass, storeLogged = true) {
+    loggedInDisplay("Logged in as " + user);
+    showElem(loginform, false);
+    if ( storeLogged ) {
+        window.localStorage.setItem("loggedUsername", user);
+        window.localStorage.setItem("loggedPassword", pass);
+    }
+}
+
+function onLoginClick() {
+    //createTweet("antonio","17 apr", "hello");
+    postData("/login", {user: usernameform.value, pass: passform.value}).then(data=>{
+        console.log(data);
+        if ( data.ok === true ){
+            onLogged(data.user, data.pass);
+        } else {
+            loginFormDisp("Failed to login!");
+        }
+    });
+}
+
+var loginFormDispTimeout = null;
+
+function loginFormDisp(text){
+    loginformDisp.innerHTML = text
+    clearTimeout(loginFormDispTimeout);
+    loginFormDispTimeout = setTimeout(()=>{
+        loginformDisp.innerHTML = ""
+    }, 1000);
+}
+
 function onRegisterClick() {
-    clearTweets();
+    //clearTweets();
     postData("/register", {user: usernameform.value, pass: passform.value}).then(data=>{
         console.log(data);
+        if ( data.ok === true ){
+            onLogged(data.user, data.pass);
+        } else {
+            loginFormDisp("Failed to register!");
+        }
     });
+}
+
+function logout(){
+    window.localStorage.removeItem("loggedUsername");
+    window.localStorage.removeItem("loggedPassword");
+    showElem(loginform,true);
+    showElem(loggedinparent,false);
+}
+
+function onLogoutClick() {
+    logout();
 }
