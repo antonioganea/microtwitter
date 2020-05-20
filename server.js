@@ -44,4 +44,6 @@ app.get('/', (req,res) => {
     });
 })
 
+app.use('/static', express.static('public'))
+
 app.listen(port, () => console.log(`Serving at http://localhost:${port}`))
