@@ -28,6 +28,16 @@ globalUser = null;
 globalPass = null;
 
 
+function checkIfLogged() {
+    let user = window.localStorage.getItem("loggedUsername");
+    let pass = window.localStorage.getItem("loggedPassword");
+    if ( user !== null && pass !== null ) {
+        onLogged(user, pass, false);
+    }
+}
+checkIfLogged();
+
+
 /*
                 <div class="tweet">
                     <div class="tweetheader">
@@ -35,7 +45,12 @@ globalPass = null;
                         <div class="date">17 apr</div>
                     </div>
                     <hr>
-                    So this is what i was saying regarding that..
+                    <article>So this is what i was saying regarding that..</article>
+                    <br>
+                    <div class="tweet-button-container">
+                        <input type="submit" value="Edit" onclick="return onEditClick(this,32);" style="margin-right: 5px;">
+                        <input type="submit" value="Delete" onclick="return onDeleteClick(this,32);">
+                    </div>
                 </div>
 */
 
@@ -47,9 +62,10 @@ function showElem(elem, show){
     }
 }
 
-function createTweet(username,date,text){
+function createTweet(username,date,text, id = -1){
     let tweet = document.createElement('div');
     tweet.setAttribute('class', 'tweet');
+    tweet.setAttribute('id','tweet-' + id);
 
     let tweetHeader = document.createElement('div');
     tweetHeader.setAttribute('class', 'tweetheader');
@@ -67,18 +83,38 @@ function createTweet(username,date,text){
     let hr = document.createElement('hr');
     tweet.appendChild(hr);
 
-    tweet.innerHTML += text;
+    let article = document.createElement('article');
+    tweet.appendChild(article);
+    article.innerHTML = text;
+
+    if ( getUser() === username ){
+        tweetAttachButtons(tweet,id);
+    }
 
     return tweet;
 }
 
-function createTweetOnBottom(user,date,text) {
-    let tw = createTweet(user,date,text);
+function tweetAttachButtons(tweet, id){
+    let br = document.createElement('br');
+    tweet.appendChild(br);
+
+    let div = document.createElement('div');
+    div.setAttribute('class','tweet-button-container');
+    tweet.appendChild(div);
+
+    div.innerHTML =  '<input type="submit" value="Edit" onclick="return onEditClick(this,' + id + ');" style="margin-right: 5px;">\
+    <input type="submit" value="Delete" onclick="return onDeleteClick(this,' + id + ');"></input>';
+}
+
+function createTweetOnBottom(user,date,text, id) {
+    let tw = createTweet(user,date,text, id);
     tweetcontainer.appendChild(tw);
 }
 
-function createTweetOnTop(user,date,text) {
-    let tw = createTweet(user,date,text);
+createTweetOnBottom('antonio','right now','this is purely generated',10);
+
+function createTweetOnTop(user,date,text, id) {
+    let tw = createTweet(user,date,text, id);
     tweetcontainer.prepend(tw);
 }
 
@@ -96,19 +132,10 @@ function getLatestTweets() {
         if (data.ok !== true){ return; }
         clearTweets();
         data.tweets.forEach(tweet => {
-            createTweetOnBottom(tweet.user, tweet.date, tweet.text);
+            createTweetOnBottom(tweet.user, tweet.date, tweet.text, tweet.id);
         });
     });
 }
-
-function checkIfLogged() {
-    let user = window.localStorage.getItem("loggedUsername");
-    let pass = window.localStorage.getItem("loggedPassword");
-    if ( user !== null && pass !== null ) {
-        onLogged(user, pass, false);
-    }
-}
-checkIfLogged();
 
 function onLogged(user, pass, storeLogged = true) {
     loggedInDisplay("Logged in as @" + user);
@@ -207,4 +234,54 @@ function onPostClick() {
     if ( text !== "" )
         postTweet(text);
     tweetEditor.value="";
+}
+
+
+tweetWriterPanel = document.getElementById("tweetWriterPanel");
+tweetEditorPanel = document.getElementById("tweetEditorPanel");
+tweetEditor2 = document.getElementById("tweetEditor2");
+
+var G_editTweet = null;
+var G_editTweetID = null;
+
+function editTweet(text,tweet,id){
+    G_editTweet = tweet;
+    G_editTweetID = id;
+    showElem(tweetWriterPanel,false);
+    showElem(tweetEditorPanel,true);
+    tweetEditor2.value = text;
+}
+
+function backToWriting(){
+    showElem(tweetWriterPanel,true);
+    showElem(tweetEditorPanel,false);
+}
+
+function getTweetText(tweet) {
+    return tweet.getElementsByTagName('article')[0].innerText;
+}
+
+function onEditClick(elem, id){
+    let tweet = elem.parentNode.parentNode;
+    let text = getTweetText(tweet);
+    editTweet(text,tweet,id);
+}
+
+function deleteTweet(elem,id){
+    elem.parentNode.removeChild(elem);
+}
+
+function onDeleteClick(elem, id){
+    let tweet = elem.parentNode.parentNode;
+    deleteTweet(tweet,id);
+}
+
+function setTweetText(tweet, text){
+    tweet.getElementsByTagName('article')[0].innerHTML = text;
+}
+
+function onEditTweetCommitClick(){
+    let newtext = tweetEditor2.value;
+    setTweetText(G_editTweet, newtext);
+    backToWriting();
 }

@@ -114,6 +114,11 @@ input[type=submit]:hover {
     color:white;
 }
 
+.tweet-button-container {
+    display: flex;
+    justify-content: right;
+}
+
 .tweetheader {
     font-size: larger;
     display: flex;
@@ -150,8 +155,11 @@ input[type=submit]:hover {
         flex-direction: column-reverse;
         font-size: larger;
     }
+    .leftside{
+
+    }
     .rightside {
-        
+
     }
     .footer {
         order: 10;

@@ -14,7 +14,7 @@
         <div class="middle">
             <div class="leftside">
 
-                <div class="tweet">
+                <div id="tweetWriterPanel" class="tweet">
                     <div class="tweetheader">
                         <div>Post something ✍️</div>
                     </div>
@@ -23,39 +23,36 @@
                     <input type="submit" value="Post" onclick="return onPostClick();">
                 </div>
 
+                <div id="tweetEditorPanel" class="tweet" style="display: none;">
+                    <div class="tweetheader">
+                        <div>Edit tweet ✏️</div>
+                    </div>
+                    <hr>
+                    <textarea id="tweetEditor2"></textarea>
+                    <input type="submit" value="Edit" onclick="return onEditTweetCommitClick();">
+                    <input type="submit" value="Cancel" onclick="return backToWriting();">
+                </div>
+
                 <div id="tweet-container" class="tweet-container">
-                    <div class="tweet">
+                    <div id="tweet-32" class="tweet">
                         <div class="tweetheader">
                             <div>@antonioganea</div>
                             <div class="date">17 apr</div>
                         </div>
                         <hr>
-                        So this is what i was saying regarding that..
-                    </div>
-            
-                    <div class="tweet">
-                        <div class="tweetheader">
-                            <div>@somebody</div>
-                            <div class="date">16 apr</div>
+                        <article>So this is what i was saying regarding that..</article>
+                        <br>
+                        <div class="tweet-button-container">
+                            <input type="submit" value="Edit" onclick="return onEditClick(this,32);" style="margin-right: 5px;">
+                            <input type="submit" value="Delete" onclick="return onDeleteClick(this,32);">
                         </div>
-                        <hr>
-                        Omg, I like this CSS layout so much!
-                    </div>
-
-                    <div class="tweet">
-                        <div class="tweetheader">
-                            <div>@antonioganea</div>
-                            <div class="date">12 apr</div>
-                        </div>
-                        <hr>
-                        Creating a cool website
                     </div>
                 </div>
             </div>
             <div class="rightside">
                 <div id="loggedinparent" class="smallloggedin" style="display: none;">
-                <div id="loggedin"></div>
-                <input type="submit" value="Logout" onclick="return onLogoutClick();">
+                    <div id="loggedin"></div>
+                    <input type="submit" value="Logout" onclick="return onLogoutClick();">
                 </div>
                 <div id="loginform" class="loginform">
                     Login form
