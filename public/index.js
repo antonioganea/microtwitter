@@ -143,7 +143,7 @@ function createTweetOnBottom(user,date,text, id) {
     tweetcontainer.appendChild(tw);
 }
 
-createTweetOnBottom('antonio','right now','this is purely generated',10);
+//createTweetOnBottom('antonio','right now','this is purely generated',10);
 
 function createTweetOnTop(user,date,text, id) {
     let tw = createTweet(user,date,text, id);
@@ -160,7 +160,7 @@ function loggedInDisplay(text){
 }
 
 function getLatestTweets() {
-    postData("/latest").then(data=>{
+    getData("/latest").then(data=>{
         if (data.ok !== true){ return; }
         clearTweets();
         data.tweets.forEach(tweet => {
@@ -168,6 +168,8 @@ function getLatestTweets() {
         });
     });
 }
+
+getLatestTweets()
 
 function onLogged(user, pass, storeLogged = true) {
     loggedInDisplay("Logged in as @" + user);
@@ -178,6 +180,8 @@ function onLogged(user, pass, storeLogged = true) {
         window.localStorage.setItem("loggedUsername", user);
         window.localStorage.setItem("loggedPassword", pass);
     }
+    backToWriting();
+    getLatestTweets();
 }
 
 function onLoginClick() {
@@ -214,6 +218,11 @@ function onRegisterClick() {
     });
 }
 
+function hideWritingPanels(){
+    showElem(tweetEditorPanel,false);
+    showElem(tweetWriterPanel,false);
+}
+
 function logout(){
     window.localStorage.removeItem("loggedUsername");
     window.localStorage.removeItem("loggedPassword");
@@ -221,6 +230,8 @@ function logout(){
     showElem(loggedinparent,false);
     globalPass = null;
     globalUser = null;
+    hideWritingPanels();
+    getLatestTweets();
 }
 
 function onLogoutClick() {
@@ -254,7 +265,7 @@ function postTweet(text) {
         console.log(data);
         if ( data.ok === true ){
             //onLogged(data.user, data.pass);
-            createTweetOnTop(data.user,data.date,data.text);
+            createTweetOnTop(data.user,data.date,data.text,data.id);
         } else {
             alert("Post failed!");
         }
@@ -267,7 +278,6 @@ function onPostClick() {
         postTweet(text);
     tweetEditor.value="";
 }
-
 
 tweetWriterPanel = document.getElementById("tweetWriterPanel");
 tweetEditorPanel = document.getElementById("tweetEditorPanel");
@@ -297,6 +307,7 @@ function onEditClick(elem, id){
     let tweet = elem.parentNode.parentNode;
     let text = getTweetText(tweet);
     editTweet(text,tweet,id);
+    console.log("tweet id " + id)
 }
 
 function deleteTweet(elem,id){
@@ -306,6 +317,11 @@ function deleteTweet(elem,id){
 function onDeleteClick(elem, id){
     let tweet = elem.parentNode.parentNode;
     deleteTweet(tweet,id);
+
+    let user = getUser();
+    let pass = getPass();
+    let data = { user:user, pass:pass, id:id};
+    deleteData("/deleteTweet",data);
 }
 
 function setTweetText(tweet, text){
@@ -316,4 +332,9 @@ function onEditTweetCommitClick(){
     let newtext = tweetEditor2.value;
     setTweetText(G_editTweet, newtext);
     backToWriting();
+
+    let user = getUser();
+    let pass = getPass();
+    let data = {text:newtext, user:user, pass:pass, id:G_editTweetID};
+    updateData("/editTweet",data);
 }
