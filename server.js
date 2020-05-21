@@ -72,13 +72,17 @@ app.post('/postTweet', (req,res) => {
     let pass = req.body.pass;
     let text = req.body.text;
     let ok = auth(user,pass);
-    let date = dateFormat(new Date(), "dddd, mmmm dS, yyyy, h:MM:ss TT");
+    let date = dateFormat(new Date(), "mmmm dS, h:MM:ss TT");
     res.json({ok:ok, user:user, date:date, text:text});
 })
 
 app.post('/register', (req,res) => {
     console.log(req.body);
     res.json({ok:true, user:req.body.user, pass:req.body.pass});
+})
+
+app.get('/smoketest', (req,res)=>{
+    res.json({hey:"hello"})
 })
 
 app.use('/static', express.static('public'))

@@ -1,8 +1,8 @@
 // Clientside JS file
 
-async function postData(url = '', data = {}) {
+async function reqData(method, url = '', data = {}) {
     const response = await fetch(url, {
-        method: 'POST',
+        method: method,
         mode: 'cors',
         cache: 'no-cache',
         credentials: 'same-origin',
@@ -15,6 +15,38 @@ async function postData(url = '', data = {}) {
     });
     return response.json();
 }
+
+async function postData(url,data){
+    return reqData('POST',url,data);
+}
+
+async function deleteData(url,data){
+    return reqData('DELETE',url,data);
+}
+
+async function updateData(url,data){
+    return reqData('PUT',url,data);
+}
+
+async function getData(url){
+    const response = await fetch(url, {
+        method: 'GET',
+        mode: 'cors',
+        cache: 'no-cache',
+        credentials: 'same-origin',
+        headers: {
+        'Content-Type': 'application/json'
+        },
+        redirect: 'follow',
+        referrerPolicy: 'no-referrer',
+        //body: JSON.stringify(data)
+    });
+    return response.json();
+}
+
+getData("/smoketest",{hello:"hello"}).then((data)=>{
+    console.log(data);
+});
 
 loginform = document.getElementById("loginform");
 usernameform = document.getElementById("fname");
