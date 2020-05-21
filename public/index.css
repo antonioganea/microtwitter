@@ -147,21 +147,24 @@ input[type=submit]:hover {
     color:white;
 }
 
-@media only screen and (max-width: 600px) {
+  /* Tablet */
+  @media only screen and (max-width: 1280px) {
+    .container {
+      width: 75%;
+    }
+    .middle {
+        flex-direction: column-reverse;
+        font-size: larger;
+    }
+  }
+
+/* Phone */
+@media only screen and (max-width: 768px) {
     .container {
       width: 100%;
     }
     .middle {
         flex-direction: column-reverse;
         font-size: larger;
-    }
-    .leftside{
-
-    }
-    .rightside {
-
-    }
-    .footer {
-        order: 10;
     }
   }
