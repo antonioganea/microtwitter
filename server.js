@@ -27,7 +27,7 @@ function loadTweets(){
             return;
         }
         let data = JSON.parse(buf.toString());
-        tweets = data.tweets || {};
+        tweets = data.tweets || [];
         highestID = data.highestID || 1003;
         //console.log(buf.toString());
         console.log("Loaded tweets. Highest id " + highestID);
@@ -35,6 +35,67 @@ function loadTweets(){
     });
 }
 loadTweets();
+
+var accounts = [];
+
+function loadAccounts(){
+    fs.readFile("data/accounts.txt", function(err, buf) {
+        if ( err ){
+            initEmptyFile("data/accounts.txt")
+            return;
+        }
+        let data = JSON.parse(buf.toString());
+        accounts = data.accounts || [];
+        console.log("Loaded accounts. count : " + accounts.length);
+    });
+}
+loadAccounts();
+
+function saveAccounts(){
+    let data = JSON.stringify({accounts:accounts});
+    //console.log(data);
+    fs.writeFile("data/accounts.txt", data, (err) => {
+        if (err) console.log(err);
+        //console.log("inited empty file " + fname);
+      });
+}
+
+function accountExists(username){
+    let exists = false;
+    accounts.forEach(acc => {
+        if ( acc.user == username ){
+            exists = true;
+        }
+    });
+    return exists;
+}
+
+function createUserAccount(user,pass){
+    accounts.push({user:user,pass:pass});
+    saveAccounts();
+}
+
+function registerUser(user,pass){
+    let accExist = accountExists(user)
+    if ( !accExist ){
+        createUserAccount(user,pass);
+        return true;
+    } else {
+        return false;
+    }
+}
+
+function auth(user,pass){
+    let authed = false;
+    accounts.forEach(acc => {
+        if ( acc.user === user ){
+            if (acc.pass === pass){
+                authed = true;
+            }
+        }
+    });
+    return authed;
+}
 
 function saveTweets(){
     let data = JSON.stringify({tweets:tweets,highestID:highestID});
@@ -127,14 +188,6 @@ app.get('/', (req,res) => {
     });
 })
 
-function auth(user,pass){
-    if ( user == "antonio" && pass == "pass" ) {
-        return true;
-    } else {
-        return false;
-    }
-}
-
 app.post('/login', (req,res) => {
     //console.log(req.body);
     let user = req.body.user;
@@ -201,7 +254,9 @@ app.delete('/deleteTweet',(req,res)=>{
 
 app.post('/register', (req,res) => {
     console.log(req.body);
-    res.json({ok:true, user:req.body.user, pass:req.body.pass});
+    let ok = registerUser(req.body.user,req.body.pass)
+    console.log("Register " + ok)
+    res.json({ok:ok, user:req.body.user, pass:req.body.pass});
 })
 
 app.get('/smoketest', (req,res)=>{
