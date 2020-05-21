@@ -8,9 +8,42 @@ const dateFormat = require('dateformat');
 
 var bodyParser = require('body-parser');
 
+const MAX_TWEETS = 5;
+
+function initEmptyFile(fname){
+    fs.writeFile(fname, "{}", (err) => {
+        if (err) console.log(err);
+        console.log("inited empty file " + fname);
+      });
+}
 
 var tweets = [];
 var highestID = 1003;
+
+function loadTweets(){
+    fs.readFile("data/tweets.txt", function(err, buf) {
+        if ( err ){
+            initEmptyFile("data/tweets.txt")
+            return;
+        }
+        let data = JSON.parse(buf.toString());
+        tweets = data.tweets || {};
+        highestID = data.highestID || 1003;
+        //console.log(buf.toString());
+        console.log("Loaded tweets. Highest id " + highestID);
+        //console.log(data);
+    });
+}
+loadTweets();
+
+function saveTweets(){
+    let data = JSON.stringify({tweets:tweets,highestID:highestID});
+    //console.log(data);
+    fs.writeFile("data/tweets.txt", data, (err) => {
+        if (err) console.log(err);
+        //console.log("inited empty file " + fname);
+      });
+}
 
 function generateID(){
     highestID+=1;
@@ -21,27 +54,34 @@ function pushTweet(tweet){
     let id = generateID();
     tweet.id = id;
     tweets.unshift(tweet);
+    while(tweets.length > MAX_TWEETS){
+        tweets.pop()
+    }
+    saveTweets();
     return id;
 }
 
 function deleteTweet(id){
     tweets = tweets.filter(tweet => tweet.id !== id);
+    saveTweets();
 }
 
 function editTweet(id,text){
     tweets.forEach(tweet => {
         if ( tweet.id === id ){
             tweet.text = text;
+            saveTweets();
         }
     });
 }
 
+/*
 pushTweet({
     user:"marco",
     text:"Mamma mia!",
     date:"a while back"
 });
-
+*/
 
 let indexHTML = null;
 
