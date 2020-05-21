@@ -19,7 +19,7 @@ body {
     width: 50%;
 }
 
-.header {
+header {
     /*background: dodgerblue;*/
     text-align: center;
     padding-top: 2rem;
@@ -29,7 +29,7 @@ body {
     font-family: bariol;
   }
   
-.footer {
+footer {
     padding-top: 1rem;
     text-align: center;
     color: white;
