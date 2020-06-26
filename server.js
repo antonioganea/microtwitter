@@ -4,6 +4,13 @@ const app = express()
 const port = 80
 
 const fs = require('fs');
+
+
+var data_dir = './data';
+if (!fs.existsSync(data_dir)){
+    fs.mkdirSync(data_dir);
+}
+
 const dateFormat = require('dateformat');
 
 var bodyParser = require('body-parser');
