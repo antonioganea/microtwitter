@@ -27,6 +27,32 @@ function initEmptyFile(fname){
 var tweets = [];
 var highestID = 1003;
 
+function getTimeStamp() {
+    let datetime = new Date();
+    let timestamp = '[';
+    timestamp += datetime.getDate().toString().padStart(2, '0') + '/';
+    timestamp += (datetime.getMonth() + 1).toString().padStart(2, '0') + '/';
+    timestamp += datetime.getFullYear() + ' ';
+    timestamp += datetime.getHours().toString().padStart(2, '0') + ':';
+    timestamp += datetime.getMinutes().toString().padStart(2, '0') + ':';
+    timestamp += datetime.getSeconds().toString().padStart(2, '0') + ']';
+
+    // Or alternatively, something like this:
+    // let date = dateFormat(new Date(), "mmmm dS, h:MM:ss TT");
+
+    return timestamp;
+}
+
+// boot logger service
+function logMessage( msg ){
+    msg = getTimeStamp() + ' ' + msg + '\n';
+    fs.appendFile('data/logs.txt', msg, function (err) {
+        if ( err ){
+            throw err;
+        }
+      });
+}
+
 function loadTweets(){
     fs.readFile("data/tweets.txt", function(err, buf) {
         if ( err ){
@@ -86,6 +112,7 @@ function registerUser(user,pass){
     let accExist = accountExists(user)
     if ( !accExist ){
         createUserAccount(user,pass);
+        logMessage(`User '${user}' just registered.`);
         return true;
     } else {
         return false;
@@ -225,6 +252,7 @@ app.post('/postTweet', (req,res) => {
         text:text,
         id:id
     });
+    logMessage(`User '${user}' posted a tweet. ( id = ${id} )`);
 })
 
 app.put('/editTweet', (req,res) => {
@@ -241,6 +269,7 @@ app.put('/editTweet', (req,res) => {
     }
     res.json({ok:ok, user:user, date:date, text:text});
     editTweet(id, text);
+    logMessage(`User '${user}' edited a tweet. ( id = ${id} )`);
 })
 
 app.delete('/deleteTweet',(req,res)=>{
@@ -257,6 +286,7 @@ app.delete('/deleteTweet',(req,res)=>{
     }
     res.json({ok:ok, user:user, date:date, text:text});
     deleteTweet(id);
+    logMessage(`User '${user}' deleted a tweet. ( id = ${id} )`);
 })
 
 app.post('/register', (req,res) => {
@@ -272,4 +302,7 @@ app.get('/smoketest', (req,res)=>{
 
 app.use('/static', express.static('public'))
 
-app.listen(port, () => console.log(`Serving at http://localhost:${port}`))
+app.listen(port, () => {
+    console.log(`Serving at http://localhost:${port}`)
+    logMessage("Served booted.");
+})
