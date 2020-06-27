@@ -329,6 +329,7 @@ app.post('/postTweet', (req,res) => {
     let user = req.body.user;
     let pass = req.body.pass;
     let text = req.body.text;
+    let title = req.body.title;
     let emoji = req.body.emoji;
     let ok = auth(user,pass);
     let date = dateFormat(new Date(), "mmmm dS, h:MM:ss TT");
@@ -340,12 +341,14 @@ app.post('/postTweet', (req,res) => {
         user:user,
         date:date,
         text:text,
+        title:title,
         emoji:emoji
     })
     res.json({ok:ok,
         user:user,
         date:date,
         text:text,
+        title:title,
         emoji:emoji,
         id:id
     });

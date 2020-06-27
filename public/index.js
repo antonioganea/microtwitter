@@ -136,8 +136,9 @@ function showElem(elem, show){
     }
 }
 
-function createTweet(username,date,text, emoji, id = -1){
+function createTweet(username,date,text, title, emoji, id = -1){
     emoji = emoji || '';
+    title = title || '';
 
     let tweet = document.createElement('div');
     tweet.setAttribute('class', 'tweet');
@@ -148,9 +149,13 @@ function createTweet(username,date,text, emoji, id = -1){
     tweetHeader.setAttribute('class', 'tweetheader');
     tweet.appendChild(tweetHeader);
 
-    let d1 = document.createElement('div');
-    d1.innerHTML = "@" + username;
-    tweetHeader.appendChild(d1);
+    let subHeader = document.createElement('div');
+    subHeader.setAttribute('class', 'tweetheader');
+    tweet.appendChild(subHeader);
+
+    let titleDisplay = document.createElement('tweetTitle');
+    titleDisplay.innerHTML = title;
+    tweetHeader.appendChild(titleDisplay);
 
     let d2 = document.createElement('div');
     d2.setAttribute('class', 'date');
@@ -159,7 +164,12 @@ function createTweet(username,date,text, emoji, id = -1){
 
     let emojiDisplay = document.createElement('emoji');
     emojiDisplay.innerHTML = emoji;
-    tweet.appendChild(emojiDisplay);
+    subHeader.appendChild(emojiDisplay);
+
+    let d1 = document.createElement('div');
+    d1.setAttribute('class', 'date');
+    d1.innerHTML = "@" + username;
+    subHeader.appendChild(d1);
 
     let hr = document.createElement('hr');
     tweet.appendChild(hr);
@@ -207,15 +217,15 @@ function getEditorEmoji(){
     return 'x';
 }
 
-function createTweetOnBottom(user,date,text, emoji, id) {
-    let tw = createTweet(user,date,text, emoji, id);
+function createTweetOnBottom(user,date,text, title, emoji, id) {
+    let tw = createTweet(user,date,text, title, emoji, id);
     tweetcontainer.appendChild(tw);
 }
 
 //createTweetOnBottom('antonio','right now','this is purely generated',10);
 
-function createTweetOnTop(user,date,text, emoji, id) {
-    let tw = createTweet(user,date,text, emoji, id);
+function createTweetOnTop(user,date,text,title, emoji, id) {
+    let tw = createTweet(user,date,text, title, emoji, id);
     tweetcontainer.prepend(tw);
 }
 
@@ -234,7 +244,7 @@ function getLatestTweets() {
             if (data.ok !== true){ return; }
             clearTweets();
             data.tweets.forEach(tweet => {
-                createTweetOnBottom(tweet.user, tweet.date, tweet.text, tweet.emoji, tweet.id);
+                createTweetOnBottom(tweet.user, tweet.date, tweet.text, tweet.title, tweet.emoji, tweet.id);
             });
         });
     }
@@ -311,6 +321,7 @@ function onLogoutClick() {
     logout();
 }
 
+tweetEditorTitle = document.getElementById("tweetEditorTitle");
 tweetEditor = document.getElementById("tweetEditor");
 
 function isLogged() {
@@ -329,16 +340,16 @@ function getPass() {
     return globalPass;
 }
 
-function postTweet(text, emoji) {
+function postTweet(title, text, emoji) {
     let user = getUser();
     let pass = getPass();
-    let data = {text:text, emoji:emoji, user:user, pass:pass};
+    let data = {title:title, text:text, emoji:emoji, user:user, pass:pass};
 
     postData("/postTweet", data).then(data=>{
         console.log(data);
         if ( data.ok === true ){
             //onLogged(data.user, data.pass);
-            createTweetOnTop(data.user,data.date,data.text,data.emoji,data.id);
+            createTweetOnTop(data.user,data.date,data.text,data.title,data.emoji,data.id);
         } else {
             alert("Post failed!");
         }
@@ -347,10 +358,13 @@ function postTweet(text, emoji) {
 
 function onPostClick() {
     let text = tweetEditor.value;
+    let title = tweetEditorTitle.value;
     let emoji = getWriterEmoji();
-    if ( text !== "" )
-        postTweet(text, emoji);
-    tweetEditor.value="";
+    if ( text !== "" && title !== "" ){
+        postTweet(title, text, emoji);
+        tweetEditor.value="";
+        tweetEditorTitle.value="";
+    }
 }
 
 tweetWriterPanel = document.getElementById("tweetWriterPanel");
