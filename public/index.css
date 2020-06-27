@@ -58,6 +58,14 @@ input[type=text], select {
     box-sizing: border-box;
 }
 
+.emoji-container{
+    font-size: x-large;
+}
+
+emoji {
+    font-size: x-large;
+}
+
 textarea {
     width: 100%;
     border: 1px solid #ccc;

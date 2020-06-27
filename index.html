@@ -20,7 +20,18 @@
                     </div>
                     <hr>
                     <textarea id="tweetEditor"></textarea>
-                    <input type="submit" value="Post" onclick="return onPostClick();">
+
+                    <div class="emoji-container">
+                        <input type="radio" id="rbw_heart" name="w_reaction" value="❤️"><label for="rbw_heart">❤️</label>
+                        <input type="radio" id="rbw_like" name="w_reaction" value="👍" checked><label for="rbw_like">👍</label>
+                        <input type="radio" id="rbw_dislike" name="w_reaction" value="👎"><label for="rbw_dislike">👎</label>
+                        <input type="radio" id="rbw_happy" name="w_reaction" value="😂"><label for="rbw_happy">😂</label>
+                        <input type="radio" id="rbw_sad" name="w_reaction" value="😔"><label for="rbw_sad">😔</label>
+                        <input type="radio" id="rbw_meh" name="w_reaction" value="😒"><label for="rbw_meh">😒</label>
+                    </div>
+                    <div class="tweet-button-container">
+                        <input type="submit" value="Post" onclick="return onPostClick();">
+                    </div>
                 </div>
 
                 <div id="tweetEditorPanel" class="tweet" style="display: none;">
@@ -29,8 +40,18 @@
                     </div>
                     <hr>
                     <textarea id="tweetEditor2"></textarea>
-                    <input type="submit" value="Edit" onclick="return onEditTweetCommitClick();">
-                    <input type="submit" value="Cancel" onclick="return backToWriting();">
+                    <div class="emoji-container">
+                        <input type="radio" id="rbe_heart" name="e_reaction" value="❤️"><label for="rbe_heart">❤️</label>
+                        <input type="radio" id="rbe_like" name="e_reaction" value="👍" checked><label for="rbe_like">👍</label>
+                        <input type="radio" id="rbe_dislike" name="e_reaction" value="👎"><label for="rbe_dislike">👎</label>
+                        <input type="radio" id="rbe_happy" name="e_reaction" value="😂"><label for="rbe_happy">😂</label>
+                        <input type="radio" id="rbe_sad" name="e_reaction" value="😔"><label for="rbe_sad">😔</label>
+                        <input type="radio" id="rbe_meh" name="e_reaction" value="😒"><label for="rbe_meh">😒</label>
+                    </div>
+                    <div class="tweet-button-container">
+                        <input type="submit" value="Edit" onclick="return onEditTweetCommitClick();" style="margin-right: 5px;">
+                        <input type="submit" value="Cancel" onclick="return backToWriting();">
+                    </div>
                 </div>
 
                 <div>

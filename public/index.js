@@ -1,5 +1,44 @@
 // Clientside JS file
 
+function getPageName(){
+    let url = window.location.pathname;
+    return url.split("?")[0];
+}
+
+function getParamValue(_pname){
+    var urlParams = new URLSearchParams(window.location.search);
+    if (!urlParams.has(_pname)){
+        return null;
+    }
+    return urlParams.get(_pname);
+}
+
+/*
+function getParamValue(_pname) {
+    let url = window.location.pathname;
+    var params = url.split("?")[1].split("&");
+    params.forEach(param => {
+        let split = param.split("=");
+        let pname = split[0];
+        let pvalue = split[1];
+        if ( pname === _pname ){
+            return pvalue
+        }
+    });
+    return null;
+}
+*/
+
+function isWallPage(){
+    //console.log(getParamValue("user"))
+    if ( getPageName() === "/mesaje" ){
+        if ( getParamValue("user") ) {
+            return true;
+        }
+    }
+    return false;
+}
+
 async function reqData(method, url = '', data = {}) {
     const response = await fetch(url, {
         method: method,
@@ -64,6 +103,9 @@ function checkIfLogged() {
     let user = window.localStorage.getItem("loggedUsername");
     let pass = window.localStorage.getItem("loggedPassword");
     if ( user !== null && pass !== null ) {
+        if ( isWallPage() === false ) {
+            window.location = "/mesaje?user=" + user;
+        }
         onLogged(user, pass, false);
     }
 }
@@ -94,10 +136,13 @@ function showElem(elem, show){
     }
 }
 
-function createTweet(username,date,text, id = -1){
+function createTweet(username,date,text, emoji, id = -1){
+    emoji = emoji || '';
+
     let tweet = document.createElement('div');
     tweet.setAttribute('class', 'tweet');
     tweet.setAttribute('id','tweet-' + id);
+    //tweet.innerHTML += `<emoji>${emoji}</span>`;
 
     let tweetHeader = document.createElement('div');
     tweetHeader.setAttribute('class', 'tweetheader');
@@ -111,6 +156,10 @@ function createTweet(username,date,text, id = -1){
     d2.setAttribute('class', 'date');
     d2.innerHTML = date;
     tweetHeader.appendChild(d2);
+
+    let emojiDisplay = document.createElement('emoji');
+    emojiDisplay.innerHTML = emoji;
+    tweet.appendChild(emojiDisplay);
 
     let hr = document.createElement('hr');
     tweet.appendChild(hr);
@@ -138,15 +187,35 @@ function tweetAttachButtons(tweet, id){
     <input type="submit" value="Delete" onclick="return onDeleteClick(this,' + id + ');"></input>';
 }
 
-function createTweetOnBottom(user,date,text, id) {
-    let tw = createTweet(user,date,text, id);
+function getWriterEmoji(){
+    let radios = document.getElementsByName('w_reaction');
+    for (let i = 0, length = radios.length; i < length; i++) {
+        if (radios[i].checked) {
+            return radios[i].value;
+        }
+    }
+    return 'x';
+}
+
+function getEditorEmoji(){
+    let radios = document.getElementsByName('e_reaction');
+    for (let i = 0, length = radios.length; i < length; i++) {
+        if (radios[i].checked) {
+            return radios[i].value;
+        }
+    }
+    return 'x';
+}
+
+function createTweetOnBottom(user,date,text, emoji, id) {
+    let tw = createTweet(user,date,text, emoji, id);
     tweetcontainer.appendChild(tw);
 }
 
 //createTweetOnBottom('antonio','right now','this is purely generated',10);
 
-function createTweetOnTop(user,date,text, id) {
-    let tw = createTweet(user,date,text, id);
+function createTweetOnTop(user,date,text, emoji, id) {
+    let tw = createTweet(user,date,text, emoji, id);
     tweetcontainer.prepend(tw);
 }
 
@@ -160,13 +229,15 @@ function loggedInDisplay(text){
 }
 
 function getLatestTweets() {
-    getData("/latest").then(data=>{
-        if (data.ok !== true){ return; }
-        clearTweets();
-        data.tweets.forEach(tweet => {
-            createTweetOnBottom(tweet.user, tweet.date, tweet.text, tweet.id);
+    if ( isWallPage() ) {
+        getData("/latest?user=" + getParamValue("user") ).then(data=>{
+            if (data.ok !== true){ return; }
+            clearTweets();
+            data.tweets.forEach(tweet => {
+                createTweetOnBottom(tweet.user, tweet.date, tweet.text, tweet.emoji, tweet.id);
+            });
         });
-    });
+    }
 }
 
 getLatestTweets()
@@ -190,6 +261,7 @@ function onLoginClick() {
         console.log(data);
         if ( data.ok === true ){
             onLogged(data.user, data.pass);
+            window.location = "/mesaje?user=" + data.user;
         } else {
             loginFormDisp("Failed to login!");
         }
@@ -212,6 +284,7 @@ function onRegisterClick() {
         console.log(data);
         if ( data.ok === true ){
             onLogged(data.user, data.pass);
+            window.location = "/mesaje?user=" + data.user;
         } else {
             loginFormDisp("Failed to register!");
         }
@@ -256,16 +329,16 @@ function getPass() {
     return globalPass;
 }
 
-function postTweet(text) {
+function postTweet(text, emoji) {
     let user = getUser();
     let pass = getPass();
-    let data = {text:text, user:user, pass:pass};
+    let data = {text:text, emoji:emoji, user:user, pass:pass};
 
     postData("/postTweet", data).then(data=>{
         console.log(data);
         if ( data.ok === true ){
             //onLogged(data.user, data.pass);
-            createTweetOnTop(data.user,data.date,data.text,data.id);
+            createTweetOnTop(data.user,data.date,data.text,data.emoji,data.id);
         } else {
             alert("Post failed!");
         }
@@ -274,8 +347,9 @@ function postTweet(text) {
 
 function onPostClick() {
     let text = tweetEditor.value;
+    let emoji = getWriterEmoji();
     if ( text !== "" )
-        postTweet(text);
+        postTweet(text, emoji);
     tweetEditor.value="";
 }
 
@@ -328,13 +402,19 @@ function setTweetText(tweet, text){
     tweet.getElementsByTagName('article')[0].innerHTML = text;
 }
 
+function setTweetEmoji(tweet, emoji){
+    tweet.getElementsByTagName('emoji')[0].innerHTML = emoji;
+}
+
 function onEditTweetCommitClick(){
     let newtext = tweetEditor2.value;
+    let emoji = getEditorEmoji();
     setTweetText(G_editTweet, newtext);
+    setTweetEmoji(G_editTweet, emoji);
     backToWriting();
 
     let user = getUser();
     let pass = getPass();
-    let data = {text:newtext, user:user, pass:pass, id:G_editTweetID};
+    let data = {text:newtext, emoji:emoji, user:user, pass:pass, id:G_editTweetID};
     updateData("/editTweet",data);
 }
