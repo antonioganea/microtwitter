@@ -262,6 +262,15 @@ function onLogged(user, pass, storeLogged = true) {
         window.localStorage.setItem("loggedPassword", pass);
     }
     backToWriting();
+
+    if ( isWallPage() ){
+        if ( getParamValue("user") === user ){
+            showElem(tweetWriterPanel, true);
+        } else {
+            showElem(tweetWriterPanel, false);
+        }
+    }
+
     getLatestTweets();
 }
 
